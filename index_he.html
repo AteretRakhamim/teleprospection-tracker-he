@@ -376,65 +376,6 @@
 </div>
 </div>
 </div>
-
-  <!-- Début synchronisation Google Sheets -->
-  <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwjM9eNQlXaB1UDTpMpHqm9vNWJIkTuBbrbGaVf4ZIPAiVaHggit9xLO-pcaXUzCziN/exec';
-
-    async function chargerDepuisGoogleSheets() {
-      try {
-        const response = await fetch(WEB_APP_URL);
-        const csvText = await response.text();
-        const lines = csvText.trim().split('\n');
-        const headers = lines.shift().split(',');
-        window.donnees = lines.map(line => {
-          const cols = line.split(',');
-          const obj = {};
-          headers.forEach((h, i) => { obj[h] = cols[i] || ''; });
-          return obj;
-        });
-        if (typeof mettreAJourSelects === 'function') mettreAJourSelects();
-        if (typeof mettreAJourAffichage === 'function') mettreAJourAffichage();
-      } catch (e) {
-        console.error('Erreur lecture Sheets:', e);
-      }
-    }
-
-    async function envoyerVersGoogleSheets(data) {
-      try {
-        const response = await fetch(WEB_APP_URL, {
-          method: 'POST',
-          body: JSON.stringify(data)
-        });
-        return await response.json();
-      } catch (e) {
-        console.error('Erreur écriture Sheets:', e);
-      }
-    }
-
-    function ajouterEntree() {
-      const telepros = document.getElementById('teleprospectrice').value
-                      || document.getElementById('nouvelleTeleprospectrice').value.trim();
-      const entry = {
-        "Téléprospectrice": telepros,
-        "Date": document.getElementById('date').value,
-        "Heure début": document.getElementById('heureDebut').value,
-        "Heure fin": document.getElementById('heureFin').value,
-        "Nb d'appels": document.getElementById('nbAppels').value,
-        "Personnes jointes": document.getElementById('nbPersonnesJointes').value,
-        "Nb de dons": document.getElementById('nbDons').value,
-        "Montants": document.getElementById('montantDons').value
-      };
-      envoyerVersGoogleSheets(entry)
-        .then(() => chargerDepuisGoogleSheets())
-        .catch(console.error);
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      chargerDepuisGoogleSheets();
-    });
-  </script>
-  <!-- Fin synchronisation Google Sheets -->
          <!-- Sync Google Sheets -->
   <script src="sync.js"></script>
 </body>
